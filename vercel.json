@@ -2,7 +2,15 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/index.php",
+      "src": "public/index.php",
+      "use": "@vercel/php"
+    },
+    {
+      "src": "api/**/*.php",
+      "use": "@vercel/php"
+    },
+    {
+      "src": "routes/**/*.php",
       "use": "@vercel/php"
     },
     {
@@ -11,15 +19,23 @@
     }
   ],
   "routes": [
-    { "handle": "filesystem" },
-    { "src": "/.*", "dest": "/api/index.php" }
+    {
+      "src": "/(.*)",
+      "dest": "/public/index.php"
+    }
   ],
   "env": {
     "APP_ENV": "production",
     "APP_DEBUG": "false",
     "APP_URL": "https://gestionvehicule.vercel.app",
-    "DB_CONNECTION": "sqlite",
+    "LOG_CHANNEL": "stderr",
     "SESSION_DRIVER": "cookie",
-    "SESSION_SECURE_COOKIE": "true"
+    "SESSION_SECURE_COOKIE": "true",
+    "VIEW_COMPILED_PATH": "/tmp/storage/framework/views"
+  },
+  "build": {
+    "env": {
+      "NODE_ENV": "production"
+    }
   }
 }

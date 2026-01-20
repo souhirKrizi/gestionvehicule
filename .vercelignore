@@ -1,46 +1,60 @@
+# Dependencies
 /node_modules
 /vendor
-/.git
-/.github
-/.vscode
-/.idea
-/tests
-/storage/*.key
+/composer.lock
+/package-lock.json
+
+# Environment files
 /.env
 /.env.*
 !.env.production
-/package-lock.json
-/composer.lock
-/phpunit.xml
-/README.md
-/.gitignore
-/.editorconfig
-/.gitattributes
-/*.md
-/routes_list.txt
-/clean-test-user.php
-/delete-users.php
-/setup-mail.php
-/show-users.php
-/test-notification.php
-/update-phones.php
-/deploy.*
 
-# Ignore development assets
-/public/build
+# Build files
 /public/hot
 /public/storage
+/public/build
 
-# Ignore npm debug logs
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+# Logs
+/storage/logs/*.log
 
-# Ignore local environment files
-.env.*.local
-.env.local
+# Cache
+/bootstrap/cache/*
+/storage/framework/cache/*
+/storage/framework/views/*
 
-# Ignore IDE specific files
-.idea
-.vscode
+# Tests
+/coverage
+/phpunit.xml
+/tests/
+
+# Development
+/.fleet
+/.idea
+/.vscode
+/.github
+
+# Documentation
+/*.md
+/README.*
+
+# System Files
+.DS_Store
+Thumbs.db
+
+# Vercel specific
+.vercel
+.vercel_build_output.log
+
+# Local development files
+Homestead.json
+Homestead.yaml
+Vagrantfile
+
+# Debug files
+.phpunit.result.cache
+.php-cs-fixer.cache
+
+# IDE specific files
 *.sublime-*
+*.sublime-project
+*.sublime-workspace
