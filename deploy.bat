@@ -57,9 +57,9 @@ echo.
 echo 🌐 Application disponible sur: http://localhost:8000
 echo.
 echo 👤 Comptes de test:
-echo    Admin:  admin@academy.mil / admin123
-echo    User 1: user1@academy.mil / user123
-echo    User 2: user2@academy.mil / user123
+echo    Admin:  admin@gmail.com / admin123
+echo    User 1: user1@gmail.com / user123
+echo    User 2: user2@gmail.com / user123
 echo.
 echo 📊 Pour demarrer le serveur:
 echo    php artisan serve --host=0.0.0.0 --port=8000

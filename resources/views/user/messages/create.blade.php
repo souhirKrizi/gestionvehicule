@@ -7,7 +7,7 @@
 <div class="max-w-2xl mx-auto">
     <div class="mb-6">
         <h2 class="text-3xl font-bold text-gray-900">📩 Contacter l'Administrateur</h2>
-        <p class="text-gray-600 mt-2">Envoyez un message à Ali Krizi</p>
+        <p class="text-gray-600 mt-2">Envoyez un message à Ali</p>
     </div>
 
     <div class="bg-white rounded-xl shadow-md p-8">

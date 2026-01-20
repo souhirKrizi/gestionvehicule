@@ -25,7 +25,7 @@ Serveur: Laravel Development Server
 
 #### 1. Administrateur
 ```
-📧 Email: admin@academy.mil
+📧 Email: ali@gmail.com
 🔐 Mot de passe: admin123
 👤 Rôle: Admin
 ✅ Statut: Approuvé
@@ -33,7 +33,7 @@ Serveur: Laravel Development Server
 
 #### 2. Utilisateur (Approuvé)
 ```
-📧 Email: user1@academy.mil
+📧 Email: user1@gmail.com
 🔐 Mot de passe: user123
 👤 Rôle: User
 ✅ Statut: Approuvé
@@ -41,7 +41,7 @@ Serveur: Laravel Development Server
 
 #### 3. Utilisateur (En attente)
 ```
-📧 Email: user2@academy.mil
+📧 Email: user2@gmail.com
 🔐 Mot de passe: user123
 👤 Rôle: User
 ⏳ Statut: En attente d'approbation
@@ -72,7 +72,7 @@ Serveur: Laravel Development Server
 
 ### Interface Admin
 ```
-Accès: admin@academy.mil / admin123
+Accès: ali@gmail.com / admin123
 Routes:
   ✓ /admin/dashboard .......... Tableau de bord
   ✓ /admin/vehicles ........... Gestion des véhicules (CRUD)
@@ -82,7 +82,7 @@ Routes:
 
 ### Interface Utilisateur
 ```
-Accès: user1@academy.mil / user123
+Accès: user1@gmail.com / user123
 Routes:
   ✓ /user/vehicles ........... Consulter les véhicules
   ✓ /user/messages ........... Envoyer des messages
@@ -320,8 +320,8 @@ Pour déployer en production:
 
 ```
 ✅ App opérationnelle sur http://localhost:8000
-✅ Admin: admin@academy.mil / admin123
-✅ User: user1@academy.mil / user123
+✅ Admin: ali@gmail.com/ admin123
+✅ User: user1@gmail.com/ user123
 ✅ BD prête avec 3 utilisateurs
 ✅ 41 routes disponibles
 ✅ Prêt pour production

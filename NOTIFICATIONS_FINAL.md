@@ -105,7 +105,7 @@ Modifications:
 
 ### ✅ Tests Fonctionnels
 ```
-✓ Utilisateur trouvé: user2@academy.mil
+✓ Utilisateur trouvé: user2@gmail.com
 ✓ Notification envoyée avec succès
 ✓ Email généré et loggé
 ✓ Configuration détectée correctement

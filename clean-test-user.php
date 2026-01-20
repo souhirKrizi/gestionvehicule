@@ -7,10 +7,10 @@ use App\Models\User;
 
 echo "🗑️  Suppression de Test User Notification...\n\n";
 
-$user = User::where('email', 'test-notification@academy.mil')->first();
+$user = User::where('email', 'test-notification@gmail.com')->first();
 if ($user) {
     $user->delete();
-    echo "✅ Test User Notification (test-notification@academy.mil) supprimé\n\n";
+    echo "✅ Test User Notification (test-notification@gmail.com) supprimé\n\n";
 } else {
     echo "⚠️  Utilisateur non trouvé\n\n";
 }

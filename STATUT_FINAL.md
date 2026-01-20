@@ -56,9 +56,9 @@ Status: ✅ Accessible sans erreur
 
 ### Comptes de Test Disponibles
 ```
-Admin:   admin@academy.mil / admin123
-User 1:  user1@academy.mil / user123
-User 2:  user2@academy.mil / user123
+Admin:   admin@gmail.com/ admin123
+User 1:  user1@gmail.com/ user123
+User 2:  user2@gmail.com/ user123
 ```
 
 ### Fonctionnalités Actives

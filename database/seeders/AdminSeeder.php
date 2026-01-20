@@ -12,8 +12,8 @@ class AdminSeeder extends Seeder
     public function run()
     {
         User::create([
-            'name' => 'Ali Krizi',
-            'email' => 'admin@academy.mil',
+            'name' => 'Ali',
+            'email' => 'ali@gmail.com',
             'password' => Hash::make('admin123'), // À changer en production
             'role' => 'admin',
             'status' => 'approved',
@@ -24,7 +24,7 @@ class AdminSeeder extends Seeder
         // Créer quelques utilisateurs de test
         User::create([
             'name' => '3eljia',
-            'email' => 'user1@academy.mil',
+            'email' => 'user1@gmail.com',
             'password' => Hash::make('user123'),
             'role' => 'user',
             'status' => 'approved',
@@ -34,7 +34,7 @@ class AdminSeeder extends Seeder
 
         User::create([
             'name' => '3eljiyaaaaa',
-            'email' => 'user2@academy.mil',
+            'email' => 'user2@gmail.com',
             'password' => Hash::make('user123'),
             'role' => 'user',
             'status' => 'pending',

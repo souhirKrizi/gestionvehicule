@@ -19,7 +19,7 @@ http://localhost:8000
 
 ### Compte Administrateur
 ```
-Email: admin@academy.mil
+Email: ali@gmail.com
 Mot de passe: admin123
 Rôle: Admin
 Statut: ✅ Approuvé
@@ -94,7 +94,7 @@ Navigateur → http://localhost:8000
 
 ### 2️⃣ Admin: Se Connecter
 ```
-Email: admin@academy.mil
+Email: ali@gmail.com
 Mot de passe: admin123
 ↓
 Dashboard Admin → Ajouter des véhicules

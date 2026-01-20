@@ -8,17 +8,17 @@ use App\Models\User;
 echo "🗑️  Suppression des utilisateurs...\n\n";
 
 // Supprimer Mohamed Slim
-$user1 = User::where('email', 'user1@academy.mil')->first();
+$user1 = User::where('email', 'user1@gmail.com')->first();
 if ($user1) {
     $user1->delete();
-    echo "✅ Mohamed Slim (user1@academy.mil) supprimé\n";
+    echo "✅ Mohamed Slim (user1@gmail.com) supprimé\n";
 }
 
 // Supprimer Ahmed Ben Ali
-$user2 = User::where('email', 'user2@academy.mil')->first();
+$user2 = User::where('email', 'user2@gmail.com')->first();
 if ($user2) {
     $user2->delete();
-    echo "✅ Ahmed Ben Ali (user2@academy.mil) supprimé\n";
+    echo "✅ Ahmed Ben Ali (user2@gmail.com) supprimé\n";
 }
 
 // Afficher les utilisateurs restants

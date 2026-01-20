@@ -125,7 +125,7 @@
                     <span class="text-2xl">📞</span>
                     <div>
                         <p class="font-semibold">Besoin d'assistance ?</p>
-                        <p class="text-sm text-green-100">Contactez l'administrateur Ali Krizi</p>
+                        <p class="text-sm text-green-100">Contactez l'administrateur Ali</p>
                     </div>
                 </div>
                 <a href="tel:21863548" 
