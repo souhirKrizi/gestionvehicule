@@ -1,0 +1,16 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+numReplicas = 1
+sleepApplication = false
+restartPolicyType = "ON_FAILURE"
+
+[environments.production.variables]
+APP_ENV = "production"
+APP_DEBUG = "false"
+DB_CONNECTION = "sqlite"
+DB_DATABASE = "/app/database/database.sqlite"
+SESSION_DRIVER = "file"
+CACHE_STORE = "file"
+QUEUE_CONNECTION = "sync"
