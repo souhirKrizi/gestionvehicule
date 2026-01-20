@@ -1,0 +1,46 @@
+/node_modules
+/vendor
+/.git
+/.github
+/.vscode
+/.idea
+/tests
+/storage/*.key
+/.env
+/.env.*
+!.env.production
+/package-lock.json
+/composer.lock
+/phpunit.xml
+/README.md
+/.gitignore
+/.editorconfig
+/.gitattributes
+/*.md
+/routes_list.txt
+/clean-test-user.php
+/delete-users.php
+/setup-mail.php
+/show-users.php
+/test-notification.php
+/update-phones.php
+/deploy.*
+
+# Ignore development assets
+/public/build
+/public/hot
+/public/storage
+
+# Ignore npm debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Ignore local environment files
+.env.*.local
+.env.local
+
+# Ignore IDE specific files
+.idea
+.vscode
+*.sublime-*
