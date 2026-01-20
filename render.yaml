@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: gestion-vehicule
+    runtime: php
+    runtimeVersion: 8.2
+    buildCommand: >
+      composer install --no-dev
+      && npm install
+      && npm run build
+      && php artisan config:cache
+      && php artisan route:cache
+      && php artisan view:cache
+    startCommand: >
+      php artisan migrate --force
+      && php -S 0.0.0.0:$PORT -t public
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_URL
+        scope: runtime
+        value: https://$RENDER_EXTERNAL_HOSTNAME
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: DB_CONNECTION
+        value: sqlite
+      - key: QUEUE_CONNECTION
+        value: database
+      - key: SESSION_DRIVER
+        value: cookie
+      - key: CACHE_STORE
+        value: database
