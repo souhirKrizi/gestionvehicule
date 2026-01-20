@@ -1,19 +1,23 @@
 #!/bin/bash
 set -e
 
-echo "🚀 Début du processus de build..."
+echo "🚀 Début du build Laravel..."
 
-# Copier le fichier d'environnement
-echo "📋 Configuration de l'environnement..."
-cp .env.example .env
+# Copier le fichier d'environnement si nécessaire
+if [ ! -f .env ]; then
+    echo "📋 Copie du fichier .env..."
+    cp .env.example .env
+fi
 
-# Installation des dépendances sans scripts
+# Installation des dépendances PHP
 echo "📦 Installation des dépendances PHP..."
-composer install --no-dev --optimize-autoloader --no-scripts --no-interaction
+composer install --no-dev --optimize-autoloader --no-interaction
 
-# Génération de la clé d'application
-echo "🔑 Génération de la clé d'application..."
-php artisan key:generate --force --no-interaction
+# Génération de la clé si elle n'existe pas
+if [ -z "$APP_KEY" ]; then
+    echo "🔑 Génération de la clé d'application..."
+    php artisan key:generate --force --no-interaction
+fi
 
 # Création de la base de données SQLite
 echo "🗄️ Création de la base de données..."
@@ -23,22 +27,17 @@ touch database/database.sqlite
 echo "🔄 Exécution des migrations..."
 php artisan migrate --force --no-interaction
 
-# Installation des dépendances Node.js
+# Installation des dépendances Node.js et build
 echo "📦 Installation des dépendances Node.js..."
 npm ci --silent
 
-# Build des assets
 echo "🎨 Build des assets..."
 npm run build
 
 # Cache des configurations
-echo "⚡ Mise en cache des configurations..."
+echo "⚡ Mise en cache..."
 php artisan config:cache --no-interaction
-php artisan route:cache --no-interaction
+php artisan route:cache --no-interaction  
 php artisan view:cache --no-interaction
 
-# Découverte des packages (maintenant que tout est configuré)
-echo "🔍 Découverte des packages..."
-php artisan package:discover --ansi
-
-echo "✅ Build terminé avec succès !"
+echo "✅ Build terminé !"
