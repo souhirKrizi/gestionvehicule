@@ -6,6 +6,14 @@ echo "🚀 Starting Laravel application..."
 # Set working directory
 cd /app || exit 1
 
+# Ensure Node.js and npm are in the PATH
+export PATH="/usr/local/bin:$PATH"
+
+# Verify Node.js and npm are available
+echo "🔍 Checking Node.js and npm..."
+node --version || { echo "❌ Node.js is not installed"; exit 1; }
+npm --version || { echo "❌ npm is not installed"; exit 1; }
+
 # Install PHP dependencies
 echo "📦 Installing PHP dependencies..."
 composer install --no-dev --optimize-autoloader --no-interaction
@@ -21,11 +29,19 @@ chmod 664 database/database.sqlite 2>/dev/null || true
 
 # Install Node.js dependencies
 echo "📦 Installing Node.js dependencies..."
-npm ci --silent --legacy-peer-deps
+if [ -f "/usr/local/bin/npm" ]; then
+    /usr/local/bin/npm ci --silent --legacy-peer-deps
+else
+    npm ci --silent --legacy-peer-deps
+fi
 
 # Build assets
 echo "🎨 Building assets..."
-npx vite build
+if [ -f "/usr/local/bin/npx" ]; then
+    /usr/local/bin/npx vite build
+else
+    npx vite build
+fi
 
 # Clear caches
 echo "🧹 Clearing caches..."
