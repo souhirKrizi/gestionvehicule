@@ -9,10 +9,40 @@ cd /app || exit 1
 # Définir le PATH pour inclure les binaires Node.js
 export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin"
 
+# Configuration de la base de données SQLite
+SQLITE_DB_PATH="/app/database/database.sqlite"
+SQLITE_DIR="/app/database"
+
+# Créer le répertoire de la base de données s'il n'existe pas
+if [ ! -d "$SQLITE_DIR" ]; then
+    echo "🔧 Creating database directory..."
+    mkdir -p "$SQLITE_DIR"
+    chmod -R 755 "$SQLITE_DIR"
+    echo "✅ Database directory created at $SQLITE_DIR"
+fi
+
+# Créer le fichier de base de données s'il n'existe pas
+if [ ! -f "$SQLITE_DB_PATH" ]; then
+    echo "🔧 Creating SQLite database file..."
+    touch "$SQLITE_DB_PATH"
+    chmod 666 "$SQLITE_DB_PATH"
+    echo "✅ SQLite database created at $SQLITE_DB_PATH"
+    
+    # Exécuter les migrations après la création de la base de données
+    echo "🔄 Running database migrations..."
+    php artisan migrate --force
+    
+    # Exécuter les seeders si nécessaire
+    # php artisan db:seed --force
+else
+    echo "ℹ️  SQLite database already exists at $SQLITE_DB_PATH"
+fi
+
 # Vérification de l'environnement
 echo "🔍 Checking environment..."
 echo "PATH: $PATH"
 echo "Current directory: $(pwd)"
+echo "SQLite database: $SQLITE_DB_PATH"
 
 # Vérifier l'accès à Node.js et npm
 echo "🔍 Checking Node.js installation..."
