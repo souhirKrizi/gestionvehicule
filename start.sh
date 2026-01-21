@@ -1,7 +1,10 @@
 #!/bin/bash
 
-# Script de démarrage simple pour Railway
+# Script de démarrage pour Railway
 echo "🚀 Démarrage de l'application Laravel..."
+
+# Créer le répertoire de base de données s'il n'existe pas
+mkdir -p database
 
 # S'assurer que la base de données existe
 if [ ! -f database/database.sqlite ]; then
@@ -9,8 +12,18 @@ if [ ! -f database/database.sqlite ]; then
     touch database/database.sqlite
 fi
 
-# Exécuter les migrations si nécessaire
-echo "🔄 Vérification des migrations..."
+# Donner les permissions appropriées
+chmod 664 database/database.sqlite
+chmod 775 database
+
+# Optimiser Laravel pour la production
+echo "⚡ Optimisation de Laravel..."
+php artisan config:cache --no-interaction
+php artisan route:cache --no-interaction
+php artisan view:cache --no-interaction
+
+# Exécuter les migrations
+echo "🔄 Exécution des migrations..."
 php artisan migrate --force --no-interaction
 
 # Démarrer le serveur
