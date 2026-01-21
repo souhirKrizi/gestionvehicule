@@ -1,8 +1,5 @@
-# Utilisation d'une image de base avec PHP 8.2 et Node.js 20
-FROM webdevops/php:8.2
-
-# Variables d'environnement
-ENV NODE_VERSION=20.19.0
+# Utilisation d'une image de base avec PHP 8.2
+FROM php:8.2-fpm
 
 # Mise à jour et installation des dépendances système
 RUN apt-get update && apt-get install -y \
@@ -27,6 +24,12 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && npm install -g npm@latest \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+# Vérification de l'installation de Node.js
+RUN echo "Node.js version: $(node --version)" \
+    && echo "npm version: $(npm --version)" \
+    && echo "Node.js path: $(which node)" \
+    && echo "npm path: $(which npm)"
 
 # Installation de Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer

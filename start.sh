@@ -6,15 +6,36 @@ echo "🚀 Starting Laravel application..."
 # Set working directory
 cd /app || exit 1
 
+# Ajouter /usr/local/bin au PATH au cas où
+PATH="/usr/local/bin:$PATH"
+
 # Vérification de l'environnement
 echo "🔍 Checking environment..."
-which node || { echo "❌ Node.js is not in PATH"; exit 1; }
-which npm || { echo "❌ npm is not in PATH"; exit 1; }
+echo "PATH: $PATH"
 
-# Afficher les versions
-echo "Node.js version: $(node --version)"
-echo "npm version: $(npm --version)"
-echo "PHP version: $(php -v | head -n 1)"
+# Vérifier l'accès à Node.js et npm
+if ! command -v node &> /dev/null; then
+    echo "❌ Node.js is not installed or not in PATH"
+    echo "Trying to find Node.js..."
+    find / -name node -type f 2>/dev/null || echo "Node.js not found"
+    exit 1
+fi
+
+if ! command -v npm &> /dev/null; then
+    echo "❌ npm is not installed or not in PATH"
+    echo "Trying to find npm..."
+    find / -name npm -type f 2>/dev/null || echo "npm not found"
+    exit 1
+fi
+
+# Afficher les informations de version
+echo "✅ Node.js version: $(node --version)"
+echo "✅ npm version: $(npm --version)"
+echo "✅ PHP version: $(php -v | head -n 1)"
+
+# Afficher les chemins complets
+echo "📁 Node.js path: $(which node)"
+echo "📁 npm path: $(which npm)"
 
 # Install PHP dependencies
 echo "📦 Installing PHP dependencies..."
