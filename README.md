@@ -1,3 +1,13 @@
+---
+title: Gestion de Véhicules Militaires
+emoji: 🚗
+colorFrom: blue
+colorTo: green
+sdk: docker
+pinned: false
+license: mit
+---
+
 # Gestion de Véhicules Militaires
 
 Une application Laravel moderne pour la gestion de flotte de véhicules militaires.

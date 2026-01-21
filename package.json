@@ -4,7 +4,8 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "vite"
+        "dev": "vite",
+        "postinstall": "node -e \"if (!require.resolve('vite')) { console.log('Installing Vite...'); require('child_process').execSync('npm install -g vite', { stdio: 'inherit' }); }\""
     },
     "dependencies": {
         "@tailwindcss/forms": "^0.5.11",
