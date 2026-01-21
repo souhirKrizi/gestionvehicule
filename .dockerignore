@@ -1,0 +1,12 @@
+/node_modules
+/vendor
+/.git
+/.github
+/.vscode
+/.idea
+/tests
+/storage/*.key
+/.env
+/vercel.json
+/vercel-build.sh
+/.vercelignore
