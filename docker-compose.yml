@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: military-fleet-app
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - APP_KEY=
+      - APP_URL=http://localhost:8000
+      - DB_CONNECTION=sqlite
+      - DB_DATABASE=/app/database/database.sqlite
+    networks:
+      - military-fleet-network
+
+networks:
+  military-fleet-network:
+    driver: bridge

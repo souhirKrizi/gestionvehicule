@@ -19,17 +19,28 @@ RUN apt-get update && apt-get install -y \
 # Installation de Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+# Mettre à jour npm et installer npx
+RUN npm install -g npm@latest npx
+
+# Installer Vite globalement
+RUN npm install -g vite@4.5.0
+
 # Définir le répertoire de travail
 WORKDIR /app
 
-# Copier les fichiers de l'application
-COPY . .
+# Copier uniquement les fichiers nécessaires pour l'installation des dépendances
+COPY composer.json composer.lock package.json package-lock.json ./
+COPY resources/ ./resources/
+COPY vite.config.js ./
 
 # Installation des dépendances PHP
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
 
 # Installation des dépendances Node.js
 RUN npm ci --silent
+
+# Copier le reste des fichiers de l'application
+COPY . .
 
 # Build des assets
 RUN npm run build
@@ -48,6 +59,13 @@ COPY .env.huggingface .env
 
 # Générer la clé d'application
 RUN php artisan key:generate --force
+
+# Configurer le fichier de démarrage
+COPY start.sh /usr/local/bin/start.sh
+RUN chmod +x /usr/local/bin/start.sh
+
+# Commande par défaut
+CMD ["/usr/local/bin/start.sh"]
 
 # Exécuter les migrations et seeders
 RUN php artisan migrate --force && \
