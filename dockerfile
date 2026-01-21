@@ -1,7 +1,7 @@
-# Utilisation d'une image de base avec PHP 8.2 et Node.js 20
+# Utilisation d'une image de base avec PHP 8.2
 FROM php:8.2-fpm
 
-# Mise à jour et installation des dépendances système
+# Installation des dépendances système
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -18,12 +18,17 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Installation de Node.js 20.x
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs \
-    && npm install -g npm@latest \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+# Installation de Node.js 20.x via n (Node Version Manager)
+RUN curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash \
+    && export NVM_DIR="$HOME/.nvm" \
+    && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" \
+    && nvm install 20.19.0 \
+    && nvm use 20.19.0 \
+    && nvm alias default 20.19.0
+
+# Ajout de Node.js au PATH
+ENV NODE_PATH=/root/.nvm/versions/node/v20.19.0/lib/node_modules
+ENV PATH="/root/.nvm/versions/node/v20.19.0/bin:${PATH}"
 
 # Vérification de l'installation
 RUN echo "Node.js version: $(node --version)" \
