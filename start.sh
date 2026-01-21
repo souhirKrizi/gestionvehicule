@@ -7,7 +7,7 @@ echo "🚀 Starting Laravel application..."
 cd /app || exit 1
 
 # Définir le PATH pour inclure les binaires Node.js
-export PATH="/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin"
 
 # Vérification de l'environnement
 echo "🔍 Checking environment..."
@@ -15,27 +15,68 @@ echo "PATH: $PATH"
 echo "Current directory: $(pwd)"
 
 # Vérifier l'accès à Node.js et npm
-NODE_PATH=$(command -v node || echo "")
-NPM_PATH=$(command -v npm || echo "")
-
-if [ -z "$NODE_PATH" ]; then
-    echo "❌ Node.js is not installed or not in PATH"
-    echo "Searching for Node.js..."
-    find / -name node -type f 2>/dev/null | grep -v "node_modules" || echo "Node.js not found"
-    exit 1
-else
+echo "🔍 Checking Node.js installation..."
+if command -v node >/dev/null 2>&1; then
+    NODE_PATH=$(which node)
     echo "✅ Found Node.js at: $NODE_PATH"
     echo "✅ Node.js version: $(node --version)"
-fi
-
-if [ -z "$NPM_PATH" ]; then
-    echo "❌ npm is not installed or not in PATH"
-    echo "Searching for npm..."
-    find / -name npm -type f 2>/dev/null | grep -v "node_modules" || echo "npm not found"
-    exit 1
+    
+    # Vérifier npm
+    if command -v npm >/dev/null 2>&1; then
+        NPM_PATH=$(which npm)
+        echo "✅ Found npm at: $NPM_PATH"
+        echo "✅ npm version: $(npm --version)"
+    else
+        echo "❌ npm not found in PATH"
+        exit 1
+    fi
 else
-    echo "✅ Found npm at: $NPM_PATH"
-    echo "✅ npm version: $(npm --version)"
+    echo "❌ Node.js not found in PATH"
+    echo "Trying to find Node.js in common locations..."
+    
+    # Vérifier dans les emplacements courants
+    POSSIBLE_PATHS=(
+        "/usr/local/bin/node"
+        "/usr/bin/node"
+        "/opt/homebrew/bin/node"
+        "/usr/local/n/versions/node/*/bin/node"
+    )
+    
+    FOUND=0
+    for path in "${POSSIBLE_PATHS[@]}"; do
+        if [ -f "$path" ] || [ -n "$(ls -d $path 2>/dev/null)" ]; then
+            export PATH="$(dirname $path):$PATH"
+            echo "✅ Found Node.js at: $(which node)"
+            echo "✅ Node.js version: $(node --version)"
+            FOUND=1
+            break
+        fi
+    done
+    
+    if [ $FOUND -eq 0 ]; then
+        echo "❌ Node.js not found in common locations"
+        echo "Trying to install Node.js..."
+        
+        # Tenter d'installer Node.js via apt si disponible
+        if command -v apt-get >/dev/null 2>&1; then
+            echo "Installing Node.js via apt..."
+            curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+                && apt-get install -y nodejs \
+                && npm install -g npm@latest
+            
+            if [ $? -eq 0 ]; then
+                echo "✅ Node.js installed successfully"
+                echo "✅ Node.js version: $(node --version)"
+                echo "✅ npm version: $(npm --version)"
+            else
+                echo "❌ Failed to install Node.js"
+                exit 1
+            fi
+        else
+            echo "❌ Cannot install Node.js (apt not available)"
+            exit 1
+        fi
+    fi
 fi
 
 echo "✅ PHP version: $(php -v | head -n 1)"
