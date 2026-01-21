@@ -3,7 +3,7 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "npx vite build",
+        "build": "npm install && npx vite build",
         "dev": "npx vite",
         "postinstall": "echo 'Vite will be used via npx'"
     },
