@@ -6,36 +6,39 @@ echo "🚀 Starting Laravel application..."
 # Set working directory
 cd /app || exit 1
 
-# Ajouter /usr/local/bin au PATH au cas où
-PATH="/usr/local/bin:$PATH"
+# Définir le PATH pour inclure les binaires Node.js
+export PATH="/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 
 # Vérification de l'environnement
 echo "🔍 Checking environment..."
 echo "PATH: $PATH"
+echo "Current directory: $(pwd)"
 
 # Vérifier l'accès à Node.js et npm
-if ! command -v node &> /dev/null; then
+NODE_PATH=$(command -v node || echo "")
+NPM_PATH=$(command -v npm || echo "")
+
+if [ -z "$NODE_PATH" ]; then
     echo "❌ Node.js is not installed or not in PATH"
-    echo "Trying to find Node.js..."
-    find / -name node -type f 2>/dev/null || echo "Node.js not found"
+    echo "Searching for Node.js..."
+    find / -name node -type f 2>/dev/null | grep -v "node_modules" || echo "Node.js not found"
     exit 1
+else
+    echo "✅ Found Node.js at: $NODE_PATH"
+    echo "✅ Node.js version: $(node --version)"
 fi
 
-if ! command -v npm &> /dev/null; then
+if [ -z "$NPM_PATH" ]; then
     echo "❌ npm is not installed or not in PATH"
-    echo "Trying to find npm..."
-    find / -name npm -type f 2>/dev/null || echo "npm not found"
+    echo "Searching for npm..."
+    find / -name npm -type f 2>/dev/null | grep -v "node_modules" || echo "npm not found"
     exit 1
+else
+    echo "✅ Found npm at: $NPM_PATH"
+    echo "✅ npm version: $(npm --version)"
 fi
 
-# Afficher les informations de version
-echo "✅ Node.js version: $(node --version)"
-echo "✅ npm version: $(npm --version)"
 echo "✅ PHP version: $(php -v | head -n 1)"
-
-# Afficher les chemins complets
-echo "📁 Node.js path: $(which node)"
-echo "📁 npm path: $(which npm)"
 
 # Install PHP dependencies
 echo "📦 Installing PHP dependencies..."

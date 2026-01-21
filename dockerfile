@@ -1,7 +1,7 @@
-# Utilisation d'une image de base avec PHP 8.2
+# Utilisation d'une image de base avec PHP 8.2 et Node.js 20
 FROM php:8.2-fpm
 
-# Mise à jour et installation des dépendances système
+# Installation des dépendances système
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -18,18 +18,24 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Installation de Node.js 20.x
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs \
+# Installation de Node.js 20.x via n (Node Version Manager)
+RUN curl -L https://raw.githubusercontent.com/tj/n/master/bin/n -o n \
+    && bash n lts \
+    && rm n \
     && npm install -g npm@latest \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && npm install -g n \
+    && n 20.19.0 \
+    && npm install -g npm@latest \
+    && ln -sf /usr/local/n/versions/node/20.19.0/bin/node /usr/local/bin/node \
+    && ln -sf /usr/local/n/versions/node/20.19.0/bin/npm /usr/local/bin/npm \
+    && ln -sf /usr/local/n/versions/node/20.19.0/bin/npx /usr/local/bin/npx
 
-# Vérification de l'installation de Node.js
+# Vérification de l'installation
 RUN echo "Node.js version: $(node --version)" \
     && echo "npm version: $(npm --version)" \
     && echo "Node.js path: $(which node)" \
-    && echo "npm path: $(which npm)"
+    && echo "npm path: $(which npm)" \
+    && echo "npx path: $(which npx)"
 
 # Installation de Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
