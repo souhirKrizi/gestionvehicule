@@ -1,4 +1,8 @@
-FROM php:8.2-cli
+# Utilisation d'une image de base avec PHP 8.2
+FROM php:8.2-fpm
+
+# Variables d'environnement
+ENV NODE_VERSION=20.19.0
 
 # Installation des dépendances système
 RUN apt-get update && apt-get install -y \
@@ -10,24 +14,35 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     libzip-dev \
+    gnupg \
+    ca-certificates \
+    wget \
     && docker-php-ext-install pdo_sqlite mbstring exif pcntl bcmath gd zip \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Installation de Node.js 20.x
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
-    && apt-get install -y nodejs \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+# Installation de Node.js avec nvm
+ENV NVM_DIR=/usr/local/nvm
+RUN mkdir -p $NVM_DIR \
+    && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash \
+    && . $NVM_DIR/nvm.sh \
+    && nvm install $NODE_VERSION \
+    && nvm alias default $NODE_VERSION \
+    && nvm use default
+
+# Ajout de Node.js et npm au PATH
+ENV NODE_PATH=$NVM_DIR/versions/node/v$NODE_VERSION/lib/node_modules
+ENV PATH=$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
 
 # Installation de Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Mettre à jour npm et installer npx
-RUN npm install -g npm@latest npx
+# Vérification des installations
+RUN node --version \
+    && npm --version \
+    && php -v
 
-# Installer Vite globalement
-RUN npm install -g vite@4.5.0
+# Installation de Vite en local (pas besoin de global)
 
 # Définir le répertoire de travail
 WORKDIR /app
