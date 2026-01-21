@@ -1,12 +1,59 @@
+# Dependencies
 /node_modules
 /vendor
+
+# Git
 /.git
 /.github
+
+# IDE
 /.vscode
 /.idea
+
+# Tests
 /tests
-/storage/*.key
+
+# Environment files
 /.env
+/.env.local
+/.env.development
+
+# Storage
+/storage/*.key
+/storage/logs/*
+!/storage/logs/.gitkeep
+
+# Deployment files for other platforms
 /vercel.json
 /vercel-build.sh
 /.vercelignore
+/.railway.json
+/.railwayignore
+/railway-*.sh
+/deploy*.sh
+/render.yaml
+
+# Documentation
+*.md
+!README.md
+
+# Development files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Laravel specific
+/bootstrap/cache/*
+!/bootstrap/cache/.gitkeep
+
+# Test and utility files
+clean-test-user.php
+delete-users.php
+show-users.php
+test-notification.php
+update-phones.php
+setup-mail.php

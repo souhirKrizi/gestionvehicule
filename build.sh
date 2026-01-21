@@ -14,14 +14,22 @@ echo "📦 Installation des dépendances PHP..."
 composer install --no-dev --optimize-autoloader --no-interaction
 
 # Génération de la clé si elle n'existe pas
-if [ -z "$APP_KEY" ]; then
+if [ -z "$APP_KEY" ] || [ "$APP_KEY" = "" ]; then
     echo "🔑 Génération de la clé d'application..."
     php artisan key:generate --force --no-interaction
 fi
 
+# Création des répertoires nécessaires
+echo "📁 Création des répertoires..."
+mkdir -p database storage/logs storage/framework/{cache,sessions,views} bootstrap/cache
+
 # Création de la base de données SQLite
 echo "🗄️ Création de la base de données..."
 touch database/database.sqlite
+
+# Permissions
+chmod -R 775 storage bootstrap/cache
+chmod 664 database/database.sqlite 2>/dev/null || true
 
 # Exécution des migrations
 echo "🔄 Exécution des migrations..."

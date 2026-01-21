@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Script de démarrage pour Railway
 echo "🚀 Démarrage de l'application Laravel..."
@@ -31,7 +32,10 @@ php artisan view:clear --no-interaction || true
 php artisan cache:clear --no-interaction || true
 
 # Générer la clé d'application si nécessaire
-php artisan key:generate --no-interaction --force || true
+if [ -z "$APP_KEY" ] || [ "$APP_KEY" = "" ]; then
+    echo "🔑 Génération de la clé d'application..."
+    php artisan key:generate --no-interaction --force
+fi
 
 # Optimiser Laravel pour la production
 echo "⚡ Optimisation de Laravel..."
@@ -45,4 +49,4 @@ php artisan migrate --force --no-interaction
 
 # Démarrer le serveur
 echo "🌐 Démarrage du serveur sur le port $PORT..."
-php artisan serve --host=0.0.0.0 --port=$PORT
+exec php artisan serve --host=0.0.0.0 --port=$PORT

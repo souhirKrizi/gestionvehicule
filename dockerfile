@@ -1,6 +1,6 @@
-FROM php:8.2-apache
+FROM php:8.2-cli
 
-# Mise à jour et installation des dépendances
+# Installation des dépendances système
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -10,28 +10,60 @@ RUN apt-get update && apt-get install -y \
     zip \
     unzip \
     libzip-dev \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip \
-    && a2enmod rewrite
+    nodejs \
+    npm \
+    && docker-php-ext-install pdo_sqlite mbstring exif pcntl bcmath gd zip \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Installation de Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Configuration de l'application
-WORKDIR /var/www/html
+# Définir le répertoire de travail
+WORKDIR /app
+
+# Copier les fichiers de l'application
 COPY . .
 
-# Installation des dépendances
-RUN composer install --no-interaction --optimize-autoloader --no-dev
+# Installation des dépendances PHP
+RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Configuration des permissions
-RUN chown -R www-data:www-data /var/www/html/storage \
-    && chmod -R 775 /var/www/html/storage
+# Installation des dépendances Node.js
+RUN npm ci --silent
 
-# Script d'entrée
-COPY docker-entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-ENTRYPOINT ["docker-entrypoint.sh"]
+# Build des assets
+RUN npm run build
 
-# Exposition du port
-EXPOSE 80
-CMD ["apache2-foreground"]
+# Créer les répertoires nécessaires
+RUN mkdir -p database storage/logs storage/framework/{cache,sessions,views} bootstrap/cache
+
+# Créer la base de données SQLite
+RUN touch database/database.sqlite
+
+# Définir les permissions
+RUN chmod -R 775 storage bootstrap/cache database
+
+# Copier le fichier d'environnement pour Hugging Face
+COPY .env.huggingface .env
+
+# Générer la clé d'application
+RUN php artisan key:generate --force
+
+# Exécuter les migrations et seeders
+RUN php artisan migrate --force && \
+    php artisan db:seed --force
+
+# Optimiser pour la production
+RUN php artisan config:cache && \
+    php artisan route:cache && \
+    php artisan view:cache
+
+# Copier et rendre exécutable le script de démarrage
+COPY start-huggingface.sh /app/start-huggingface.sh
+RUN chmod +x /app/start-huggingface.sh
+
+# Exposer le port 7860 (requis par Hugging Face)
+EXPOSE 7860
+
+# Commande de démarrage
+CMD ["/app/start-huggingface.sh"]
