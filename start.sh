@@ -6,8 +6,12 @@ echo "🚀 Starting Laravel application..."
 # Set working directory
 cd /app || exit 1
 
-# Ensure Node.js and npm are in the PATH
-export PATH="/usr/local/bin:$PATH"
+# Load NVM
+export NVM_DIR="/usr/local/nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+# Add NVM to PATH
+export PATH="$NVM_DIR/versions/node/v20.19.0/bin:$PATH"
 
 # Verify Node.js and npm are available
 echo "🔍 Checking Node.js and npm..."
