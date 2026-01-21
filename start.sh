@@ -6,17 +6,15 @@ echo "🚀 Starting Laravel application..."
 # Set working directory
 cd /app || exit 1
 
-# Load NVM
-export NVM_DIR="/usr/local/nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+# Vérification de l'environnement
+echo "🔍 Checking environment..."
+which node || { echo "❌ Node.js is not in PATH"; exit 1; }
+which npm || { echo "❌ npm is not in PATH"; exit 1; }
 
-# Add NVM to PATH
-export PATH="$NVM_DIR/versions/node/v20.19.0/bin:$PATH"
-
-# Verify Node.js and npm are available
-echo "🔍 Checking Node.js and npm..."
-node --version || { echo "❌ Node.js is not installed"; exit 1; }
-npm --version || { echo "❌ npm is not installed"; exit 1; }
+# Afficher les versions
+echo "Node.js version: $(node --version)"
+echo "npm version: $(npm --version)"
+echo "PHP version: $(php -v | head -n 1)"
 
 # Install PHP dependencies
 echo "📦 Installing PHP dependencies..."

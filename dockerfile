@@ -1,10 +1,10 @@
-# Utilisation d'une image de base avec PHP 8.2
-FROM php:8.2-fpm
+# Utilisation d'une image de base avec PHP 8.2 et Node.js 20
+FROM webdevops/php:8.2
 
 # Variables d'environnement
 ENV NODE_VERSION=20.19.0
 
-# Installation des dépendances système
+# Mise à jour et installation des dépendances système
 RUN apt-get update && apt-get install -y \
     git \
     curl \
@@ -21,18 +21,12 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Installation de Node.js avec nvm
-ENV NVM_DIR=/usr/local/nvm
-RUN mkdir -p $NVM_DIR \
-    && curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash \
-    && . $NVM_DIR/nvm.sh \
-    && nvm install $NODE_VERSION \
-    && nvm alias default $NODE_VERSION \
-    && nvm use default
-
-# Ajout de Node.js et npm au PATH
-ENV NODE_PATH=$NVM_DIR/versions/node/v$NODE_VERSION/lib/node_modules
-ENV PATH=$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH
+# Installation de Node.js 20.x
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g npm@latest \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Installation de Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -41,8 +35,6 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 RUN node --version \
     && npm --version \
     && php -v
-
-# Installation de Vite en local (pas besoin de global)
 
 # Définir le répertoire de travail
 WORKDIR /app
