@@ -3,9 +3,9 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "vite build",
-        "dev": "vite",
-        "postinstall": "node -e \"if (!require.resolve('vite')) { console.log('Installing Vite...'); require('child_process').execSync('npm install -g vite', { stdio: 'inherit' }); }\""
+        "build": "npx vite build",
+        "dev": "npx vite",
+        "postinstall": "echo 'Vite will be used via npx'"
     },
     "dependencies": {
         "@tailwindcss/forms": "^0.5.11",
@@ -14,9 +14,12 @@
         "laravel-vite-plugin": "^2.0.0",
         "postcss": "^8.5.6",
         "tailwindcss": "^4.1.18",
-        "vite": "^7.0.7"
+        "vite": "^4.5.0"
     },
     "devDependencies": {
         "concurrently": "^9.0.1"
+    },
+    "engines": {
+        "node": ">=16.0.0"
     }
 }

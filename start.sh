@@ -1,69 +1,55 @@
 #!/bin/bash
 set -e
 
-# Script de démarrage pour Railway
-echo "🚀 Démarrage de l'application Laravel..."
+echo "🚀 Starting Laravel application..."
 
-# Vérifier que nous sommes dans le bon répertoire
+# Set working directory
 cd /app || exit 1
 
-# Installer/mettre à jour les dépendances Composer
-echo "📦 Installation des dépendances..."
+# Install PHP dependencies
+echo "📦 Installing PHP dependencies..."
 composer install --no-dev --optimize-autoloader --no-interaction
 
-# Créer les répertoires nécessaires
-mkdir -p database storage/logs storage/framework/{cache,sessions,views}
+# Create necessary directories
+echo "📂 Creating required directories..."
+mkdir -p database storage/logs storage/framework/{cache,sessions,views} bootstrap/cache
 
-# Build des assets
-echo "🎨 Building assets..."
-# Installer Vite localement s'il n'est pas présent
-if [ ! -f node_modules/.bin/vite ]; then
-    echo "📦 Installing Vite locally..."
-    npm install --save-dev vite@4.5.0
-fi
-
-# Utiliser le binaire Vite local
-./node_modules/.bin/vite build || {
-    echo "❌ Vite build failed, trying with npx..."
-    npx vite build || {
-        echo "❌ All build attempts failed"
-        exit 1
-    }
-}
-
-# S'assurer que la base de données existe
-if [ ! -f database/database.sqlite ]; then
-    echo "📁 Création de la base de données SQLite..."
-    touch database/database.sqlite
-fi
-
-# Donner les permissions appropriées
+# Set permissions
+echo "🔒 Setting permissions..."
 chmod -R 775 storage bootstrap/cache
 chmod 664 database/database.sqlite 2>/dev/null || true
 
-# Nettoyer les caches existants
-echo "🧹 Nettoyage des caches..."
-php artisan config:clear --no-interaction || true
-php artisan route:clear --no-interaction || true
-php artisan view:clear --no-interaction || true
-php artisan cache:clear --no-interaction || true
+# Install Node.js dependencies
+echo "📦 Installing Node.js dependencies..."
+npm ci --silent --legacy-peer-deps
 
-# Générer la clé d'application si nécessaire
+# Build assets
+echo "🎨 Building assets..."
+npx vite build
+
+# Clear caches
+echo "🧹 Clearing caches..."
+php artisan config:clear --no-interaction
+php artisan route:clear --no-interaction
+php artisan view:clear --no-interaction
+php artisan cache:clear --no-interaction
+
+# Generate application key if not set
 if [ -z "$APP_KEY" ] || [ "$APP_KEY" = "" ]; then
-    echo "🔑 Génération de la clé d'application..."
+    echo "🔑 Generating application key..."
     php artisan key:generate --no-interaction --force
 fi
 
-# Optimiser Laravel pour la production
-echo "⚡ Optimisation de Laravel..."
+# Optimize Laravel for production
+echo "⚡ Optimizing Laravel..."
 php artisan config:cache --no-interaction
 php artisan route:cache --no-interaction
 php artisan view:cache --no-interaction
 
-# Exécuter les migrations
-echo "🔄 Exécution des migrations..."
+# Run migrations
+echo "🔄 Running migrations..."
 php artisan migrate --force --no-interaction
 
-# Démarrer le serveur
+# Start the server
 echo "🌐 Démarrage du serveur sur le port $PORT..."
 exec php artisan serve --host=0.0.0.0 --port=$PORT

@@ -36,22 +36,16 @@ COPY vite.config.js ./
 # Installation des dépendances PHP
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
 
-# Nettoyage du cache npm
-RUN rm -rf node_modules
-RUN rm -rf /root/.npm
-
 # Installation des dépendances Node.js
-RUN npm ci --silent
-
-# Installation de Vite globalement et localement
-RUN npm install -g vite@4.5.0
-RUN npm install --save-dev vite@4.5.0
-
-# Build des assets avec Vite local
-RUN npx vite build
+RUN npm ci --silent --legacy-peer-deps
 
 # Vérification de l'installation de Vite
-RUN echo "Vite version: " && npx vite --version
+RUN echo "Node version: " && node --version
+RUN echo "npm version: " && npm --version
+RUN echo "Vite version: " && npx vite --version || echo "Vite not yet installed"
+
+# Build des assets avec Vite
+RUN npx vite build
 
 # Copier le reste des fichiers de l'application
 COPY . .
