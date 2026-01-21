@@ -3,8 +3,15 @@
 # Script de démarrage pour Railway
 echo "🚀 Démarrage de l'application Laravel..."
 
-# Créer le répertoire de base de données s'il n'existe pas
-mkdir -p database
+# Vérifier que nous sommes dans le bon répertoire
+cd /app || exit 1
+
+# Installer/mettre à jour les dépendances Composer
+echo "📦 Installation des dépendances..."
+composer install --no-dev --optimize-autoloader --no-interaction
+
+# Créer les répertoires nécessaires
+mkdir -p database storage/logs storage/framework/{cache,sessions,views} bootstrap/cache
 
 # S'assurer que la base de données existe
 if [ ! -f database/database.sqlite ]; then
@@ -13,8 +20,18 @@ if [ ! -f database/database.sqlite ]; then
 fi
 
 # Donner les permissions appropriées
-chmod 664 database/database.sqlite
-chmod 775 database
+chmod -R 775 storage bootstrap/cache
+chmod 664 database/database.sqlite 2>/dev/null || true
+
+# Nettoyer les caches existants
+echo "🧹 Nettoyage des caches..."
+php artisan config:clear --no-interaction || true
+php artisan route:clear --no-interaction || true
+php artisan view:clear --no-interaction || true
+php artisan cache:clear --no-interaction || true
+
+# Générer la clé d'application si nécessaire
+php artisan key:generate --no-interaction --force || true
 
 # Optimiser Laravel pour la production
 echo "⚡ Optimisation de Laravel..."
