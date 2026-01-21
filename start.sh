@@ -12,7 +12,24 @@ echo "📦 Installation des dépendances..."
 composer install --no-dev --optimize-autoloader --no-interaction
 
 # Créer les répertoires nécessaires
-mkdir -p database storage/logs storage/framework/{cache,sessions,views} bootstrap/cache
+mkdir -p database storage/logs storage/framework/{cache,sessions,views}
+
+# Build des assets
+echo "🎨 Building assets..."
+# Installer Vite localement s'il n'est pas présent
+if [ ! -f node_modules/.bin/vite ]; then
+    echo "📦 Installing Vite locally..."
+    npm install --save-dev vite@4.5.0
+fi
+
+# Utiliser le binaire Vite local
+./node_modules/.bin/vite build || {
+    echo "❌ Vite build failed, trying with npx..."
+    npx vite build || {
+        echo "❌ All build attempts failed"
+        exit 1
+    }
+}
 
 # S'assurer que la base de données existe
 if [ ! -f database/database.sqlite ]; then
