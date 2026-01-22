@@ -19,7 +19,7 @@ class DemoDataSeeder extends Seeder
             'phone' => '+33123456789',
             'password' => Hash::make('password'),
             'role' => 'admin',
-            'is_approved' => true,
+            'status' => 'approved',
             'email_verified_at' => now(),
         ]);
 
@@ -30,7 +30,7 @@ class DemoDataSeeder extends Seeder
             'phone' => '+33987654321',
             'password' => Hash::make('password'),
             'role' => 'user',
-            'is_approved' => true,
+            'status' => 'approved',
             'email_verified_at' => now(),
         ]);
 
