@@ -6,8 +6,34 @@ echo "🚀 Starting Laravel application..."
 # Set working directory
 cd /app || exit 1
 
-# Définir le PATH pour inclure les binaires Node.js
-export PATH="/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin"
+# Configuration du PATH pour inclure Node.js
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+export PATH="$PATH:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin"
+
+# Vérification de l'environnement
+echo "🔍 Checking environment..."
+echo "PATH: $PATH"
+echo "Current directory: $(pwd)"
+
+# Vérification de Node.js
+echo "🔍 Checking Node.js installation..."
+if command -v node >/dev/null 2>&1; then
+    echo "✅ Node.js is installed at: $(which node)"
+    echo "✅ Node.js version: $(node --version)"
+else
+    echo "⚠️  Node.js is not installed. Installing Node.js 20.x..."
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs
+    
+    if ! command -v node >/dev/null 2>&1; then
+        echo "❌ Failed to install Node.js"
+        exit 1
+    fi
+    
+    echo "✅ Node.js installed successfully: $(node --version)"
+fi
 
 # Configuration de la base de données SQLite
 SQLITE_DB_PATH="/app/database/database.sqlite"
@@ -26,17 +52,41 @@ if [ ! -f "$SQLITE_DB_PATH" ]; then
     echo "🔧 Creating SQLite database file..."
     touch "$SQLITE_DB_PATH"
     chmod 666 "$SQLITE_DB_PATH"
-    echo "✅ SQLite database created at $SQLITE_DB_PATH"
+    echo "✅ SQLite database created at $SQLITE_DB_PATH"n
     
-    # Exécuter les migrations après la création de la base de données
-    echo "🔄 Running database migrations..."
-    php artisan migrate --force
-    
-    # Exécuter les seeders si nécessaire
-    # php artisan db:seed --force
+    # Mettre à jour le fichier .env pour pointer vers le bon chemin de la base de données
+    if [ -f ".env" ]; then
+        sed -i 's|DB_DATABASE=.*|DB_DATABASE='"$SQLITE_DB_PATH"'|' .env
+        echo "✅ Updated .env with database path: $SQLITE_DB_PATH"
+    fi
 else
     echo "ℹ️  SQLite database already exists at $SQLITE_DB_PATH"
 fi
+
+# Installer les dépendances Node.js
+echo "📦 Installing Node.js dependencies..."
+npm install
+
+# Compiler les assets
+echo "🔨 Building assets..."
+npm run build
+
+# Exécuter les migrations
+echo "🔄 Running database migrations..."
+php artisan migrate --force
+
+# Vider le cache
+echo "🧹 Clearing cache..."
+php artisan config:clear
+php artisan cache:clear
+php artisan view:clear
+php artisan route:clear
+
+# Optimiser l'application
+echo "⚡ Optimizing application..."
+php artisan optimize
+php artisan config:cache
+php artisan view:cache
 
 # Vérification de l'environnement
 echo "🔍 Checking environment..."

@@ -9,19 +9,19 @@
     "sleepApplication": false,
     "startCommand": "/usr/local/bin/start.sh",
     "restartPolicyType": "ON_FAILURE",
-    "restartPolicyMaxRetries": 3,
-    "environment": {
-      "APP_ENV": "production",
-      "APP_DEBUG": "false",
-      "DB_CONNECTION": "sqlite",
-      "DB_DATABASE": "/app/database/database.sqlite",
-      "CACHE_DRIVER": "file",
-      "SESSION_DRIVER": "file",
-      "QUEUE_CONNECTION": "sync"
-    }
+    "restartPolicyMaxRetries": 3
   },
   "checks": {
     "enabled": true,
     "timeout": 60
+  },
+  "variables": {
+    "APP_ENV": "production",
+    "APP_DEBUG": "false",
+    "DB_CONNECTION": "sqlite",
+    "DB_DATABASE": "/app/database/database.sqlite",
+    "CACHE_DRIVER": "file",
+    "SESSION_DRIVER": "file",
+    "QUEUE_CONNECTION": "sync"
   }
 }
