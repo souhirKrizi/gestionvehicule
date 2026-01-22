@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 🚀 Script de Déploiement - Gestion de Véhicule
-# Cet script configure tout pour rendre l'application accessible
+# Ce script configure tout pour rendre l'application accessible
 
 set -e
 
@@ -31,11 +31,27 @@ npm run build
 echo ""
 echo "4️⃣ Configuration de l'environnement..."
 cp .env.production .env
+
+# Configuration de la base de données SQLite pour Railway
+echo "DB_CONNECTION=sqlite" >> .env
+echo "DB_DATABASE=/opt/render/project/src/database/database.sqlite" >> .env
+
 php artisan key:generate --force
 
-# 5. Base de données
+# 5. Configuration de la base de données
 echo ""
 echo "5️⃣ Configuration de la base de données..."
+
+# Créer le dossier de base de données si il n'existe pas
+mkdir -p /opt/render/project/src/database
+
+# Copier le fichier de base de données s'il n'existe pas
+if [ ! -f /opt/render/project/src/database/database.sqlite ]; then
+    touch /opt/render/project/src/database/database.sqlite
+    chmod 775 /opt/render/project/src/database/database.sqlite
+fi
+
+# Exécuter les migrations
 php artisan migrate --force
 php artisan db:seed --force
 
