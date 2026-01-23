@@ -1,38 +1,12 @@
 services:
   - type: web
     name: military-fleet-app
-    env: php
+    env: docker
+    dockerfilePath: Dockerfile
     region: frankfurt
-    buildCommand: |
-      # Install system dependencies
-      apt-get update && apt-get install -y unzip
-
-      # Install Composer
-      php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-      php composer-setup.php --install-dir=/usr/local/bin --filename=composer
-      php -r "unlink('composer-setup.php');"
-
-      # Install Node.js
-      curl -sL https://deb.nodesource.com/setup_20.x | bash -
-      apt-get install -y nodejs
-
-      # Install PHP extensions
-      docker-php-ext-install pdo pdo_pgsql bcmath gd
-
-      # Install application dependencies
-      composer install --no-dev --optimize-autoloader --no-interaction --no-progress --no-scripts --no-suggest
-
-      # Build assets
-      npm ci
-      npm run build
-
-      # Cache configuration
-      php artisan config:cache
-      php artisan route:cache
-      php artisan view:cache
     startCommand: >
       php artisan migrate --force && 
-      php artisan serve --host=0.0.0.0 --port=$PORT
+      php artisan serve --host=0.0.0.0 --port=8000
     envVars:
       - key: APP_ENV
         value: production
