@@ -12,6 +12,19 @@ COPY resources/ ./resources/
 RUN npm ci && npm run production
 
 # Étape de production
+# Build stage
+FROM node:20 AS node
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY webpack.mix.js ./
+
+# Install dependencies and build assets
+RUN npm ci && npm run production
+
+# Final stage
 FROM php:8.2-fpm
 
 # Installation des dépendances système
@@ -27,7 +40,7 @@ RUN apt-get update && apt-get install -y \
     gnupg \
     ca-certificates \
     wget \
-    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip \
+    && docker-php-ext-install pdo pdo_pgsql bcmath gd zip \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
