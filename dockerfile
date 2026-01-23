@@ -1,4 +1,17 @@
-# Utilisation d'une image de base avec PHP 8.2
+# Étape de construction pour les dépendances Node.js
+FROM node:20 AS node
+
+WORKDIR /app
+
+# Copier uniquement les fichiers nécessaires pour l'installation des dépendances
+COPY package*.json ./
+COPY webpack.mix.js ./
+COPY resources/ ./resources/
+
+# Installer les dépendances et compiler les assets
+RUN npm ci && npm run production
+
+# Étape de production
 FROM php:8.2-fpm
 
 # Installation des dépendances système
@@ -8,56 +21,45 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
+    libzip-dev \
     zip \
     unzip \
-    libzip-dev \
     gnupg \
     ca-certificates \
     wget \
-    && docker-php-ext-install pdo_sqlite mbstring exif pcntl bcmath gd zip \
+    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
-
-# Installation de Node.js 20.x via n (Node Version Manager)
-RUN curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash \
-    && export NVM_DIR="$HOME/.nvm" \
-    && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" \
-    && nvm install 20.19.0 \
-    && nvm use 20.19.0 \
-    && nvm alias default 20.19.0
-
-# Ajout de Node.js au PATH
-ENV NODE_PATH=/root/.nvm/versions/node/v20.19.0/lib/node_modules
-ENV PATH="/root/.nvm/versions/node/v20.19.0/bin:${PATH}"
-
-# Vérification de l'installation
-RUN echo "Node.js version: $(node --version)" \
-    && echo "npm version: $(npm --version)" \
-    && echo "Node.js path: $(which node)" \
-    && echo "npm path: $(which npm)"
 
 # Installation de Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Vérification des installations
-RUN node --version \
-    && npm --version \
-    && php -v
-
 # Définir le répertoire de travail
-WORKDIR /app
+WORKDIR /var/www/html
 
-# Copier uniquement les fichiers nécessaires pour l'installation des dépendances
-COPY composer.json composer.lock package.json package-lock.json ./
-COPY resources/ ./resources/
-COPY vite.config.js ./
+# Copier les fichiers de l'application
+COPY . .
 
-# Installation des dépendances PHP
-RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
+# Copier les assets compilés depuis l'étape node
+COPY --from=node /app/public/build/ ./public/build/
 
-# Installation des dépendances Node.js
-RUN npm ci --silent --legacy-peer-deps
+# Installer les dépendances PHP
+RUN composer install --no-dev --optimize-autoloader --no-interaction \
+    && php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache
 
+# Définir les permissions
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Créer le lien symbolique de stockage
+RUN php artisan storage:link
+
+# Exposer le port 8000
+EXPOSE 8000
+
+# Commande de démarrage
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
 # Vérification de l'installation de Vite
 RUN echo "Node version: " && node --version
 RUN echo "npm version: " && npm --version
