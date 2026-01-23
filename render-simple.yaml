@@ -1,0 +1,54 @@
+services:
+  - type: web
+    name: carsmanagement
+    env: node
+    plan: free
+    region: frankfurt
+    buildCommand: |
+      # Install PHP 8.2
+      curl -sSL https://packages.sury.org/php/README.txt | sudo bash -x
+      sudo apt-get update
+      sudo apt-get install -y php8.2 php8.2-cli php8.2-common php8.2-curl php8.2-zip php8.2-gd php8.2-mysql php8.2-xml php8.2-mbstring php8.2-sqlite3
+      
+      # Install Composer
+      curl -sS https://getcomposer.org/installer | php
+      sudo mv composer.phar /usr/local/bin/composer
+      
+      # Install dependencies
+      composer install --no-dev --optimize-autoloader --no-interaction
+      npm ci --silent
+      npm run build
+      
+      # Setup Laravel
+      cp .env.render .env
+      mkdir -p database storage/logs storage/framework/{cache,sessions,views} bootstrap/cache
+      touch database/database.sqlite
+      chmod -R 775 storage bootstrap/cache database
+      php artisan key:generate --force
+      php artisan migrate --force
+      php artisan db:seed --force
+      php artisan config:cache
+      php artisan route:cache
+      php artisan view:cache
+    startCommand: php artisan serve --host=0.0.0.0 --port=$PORT
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_KEY
+        value: base64:XuvyCgMJdH6yEMmGtIyilBSF3mdjq2RE4kgrw9j1BL0=
+      - key: APP_URL
+        value: https://carsmanagement.onrender.com
+      - key: DB_CONNECTION
+        value: sqlite
+      - key: DB_DATABASE
+        value: /opt/render/project/src/database/database.sqlite
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: SESSION_DRIVER
+        value: file
+      - key: CACHE_STORE
+        value: file
+      - key: QUEUE_CONNECTION
+        value: sync

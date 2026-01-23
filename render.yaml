@@ -1,11 +1,14 @@
 services:
   - type: web
     name: carsmanagement
-    env: docker
-    dockerfilePath: ./Dockerfile.render
+    env: node
     plan: free
     region: frankfurt
+    buildCommand: bash render-build.sh
+    startCommand: bash render-start.sh
     envVars:
+      - key: APP_NAME
+        value: "Gestion de Véhicules Militaires"
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
@@ -14,21 +17,29 @@ services:
         value: base64:XuvyCgMJdH6yEMmGtIyilBSF3mdjq2RE4kgrw9j1BL0=
       - key: APP_URL
         value: https://carsmanagement.onrender.com
+      - key: APP_LOCALE
+        value: fr
+      - key: APP_FALLBACK_LOCALE
+        value: en
       - key: DB_CONNECTION
         value: sqlite
       - key: DB_DATABASE
-        value: /app/database/database.sqlite
+        value: /opt/render/project/src/database/database.sqlite
       - key: LOG_CHANNEL
         value: stderr
+      - key: LOG_LEVEL
+        value: error
       - key: SESSION_DRIVER
         value: file
+      - key: SESSION_LIFETIME
+        value: 120
       - key: CACHE_STORE
         value: file
       - key: QUEUE_CONNECTION
         value: sync
       - key: MAIL_MAILER
         value: log
-      - key: APP_LOCALE
-        value: fr
-      - key: APP_FALLBACK_LOCALE
-        value: en
+      - key: MAIL_FROM_ADDRESS
+        value: admin@gestion-vehicule.mil
+      - key: MAIL_FROM_NAME
+        value: "Gestion de Véhicules Militaires"
