@@ -1,68 +1,34 @@
 services:
   - type: web
-    name: military-fleet-app
+    name: carsmanagement
     env: docker
-    dockerfilePath: Dockerfile
+    dockerfilePath: ./Dockerfile.render
+    plan: free
     region: frankfurt
-    startCommand: >
-      php artisan migrate --force && 
-      php artisan serve --host=0.0.0.0 --port=8000
     envVars:
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
         value: false
       - key: APP_KEY
-        value: base64:bxa3NpVtmG911RhnagP1kxrw5m56G8M+Yw45aFjvp/w=
+        value: base64:XuvyCgMJdH6yEMmGtIyilBSF3mdjq2RE4kgrw9j1BL0=
       - key: APP_URL
-        fromService:
-          name: military-fleet-app
-          property: url
+        value: https://carsmanagement.onrender.com
+      - key: DB_CONNECTION
+        value: sqlite
+      - key: DB_DATABASE
+        value: /app/database/database.sqlite
       - key: LOG_CHANNEL
         value: stderr
       - key: SESSION_DRIVER
-        value: database
-      - key: CACHE_DRIVER
-        value: redis
+        value: file
+      - key: CACHE_STORE
+        value: file
       - key: QUEUE_CONNECTION
-        value: redis
-      - key: DB_CONNECTION
-        fromDatabase:
-          name: military-fleet-db
-          property: connectionString
-          propertyType: PGDATABASE
-      - key: DB_DATABASE
-        fromDatabase:
-          name: military-fleet-db
-          property: database
-      - key: DB_USERNAME
-        fromDatabase:
-          name: military-fleet-db
-          property: user
-      - key: DB_PASSWORD
-        fromDatabase:
-          name: military-fleet-db
-          property: password
-      - key: DB_HOST
-        fromDatabase:
-          name: military-fleet-db
-          property: host
-      - key: DB_PORT
-        fromDatabase:
-          name: military-fleet-db
-          property: port
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: military-fleet-cache
-          property: connectionString
-
-databases:
-  - name: military-fleet-db
-    databaseName: military_fleet
-    user: military_user
-    plan: free
-
-redis:
-  - name: military-fleet-cache
-    plan: free
+        value: sync
+      - key: MAIL_MAILER
+        value: log
+      - key: APP_LOCALE
+        value: fr
+      - key: APP_FALLBACK_LOCALE
+        value: en

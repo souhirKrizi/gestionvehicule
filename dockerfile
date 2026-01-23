@@ -1,105 +1,43 @@
-# Use the official PHP 8.2 Apache image
-FROM php:8.2-apache
+FROM php:8.2-cli
 
-# Install system dependencies
+# Installation des dépendances système
 RUN apt-get update && apt-get install -y \
     git \
     curl \
     libpng-dev \
     libonig-dev \
     libxml2-dev \
-    libzip-dev \
     zip \
     unzip \
-    nodejs \
-    npm \
-    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip
-
-# Install Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
-
-# Set working directory
-WORKDIR /var/www/html
-
-# Copy application files
-COPY . .
-
-# Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader --no-interaction \
-    && php artisan config:cache \
-    && php artisan route:cache \
-    && php artisan view:cache
-
-# Install Node.js dependencies and build assets
-RUN npm ci && npm run production
-
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-
-# Configure Apache
-RUN a2enmod rewrite
-COPY docker/000-default.conf /etc/apache2/sites-available/000-default.conf
-
-# Expose port 80
-EXPOSE 80
-
-# Start Apache
-CMD ["apache2-foreground"]
-RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
     libzip-dev \
-    zip \
-    unzip \
-    gnupg \
-    ca-certificates \
-    wget \
-    && docker-php-ext-install pdo pdo_pgsql bcmath gd zip \
+    && docker-php-ext-install pdo_sqlite mbstring exif pcntl bcmath gd zip \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+# Installation de Node.js 20
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs
 
 # Installation de Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Définir le répertoire de travail
-WORKDIR /var/www/html
+WORKDIR /app
 
-# Copier les fichiers de l'application
+# Copier les fichiers de configuration d'abord pour optimiser le cache Docker
+COPY composer.json composer.lock package.json package-lock.json ./
+
+# Installation des dépendances PHP
+RUN composer install --no-dev --optimize-autoloader --no-interaction
+
+# Installation des dépendances Node.js
+RUN npm ci --silent
+
+# Copier le reste des fichiers
 COPY . .
 
-# Copier les assets compilés depuis l'étape node
-COPY --from=node /app/public/build/ ./public/build/
-
-# Installer les dépendances PHP
-RUN composer install --no-dev --optimize-autoloader --no-interaction \
-    && php artisan config:cache \
-    && php artisan route:cache \
-    && php artisan view:cache
-
-# Définir les permissions
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-
-# Créer le lien symbolique de stockage
-RUN php artisan storage:link
-
-# Exposer le port 8000
-EXPOSE 8000
-
-# Commande de démarrage
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
-# Vérification de l'installation de Vite
-RUN echo "Node version: " && node --version
-RUN echo "npm version: " && npm --version
-RUN echo "Vite version: " && npx vite --version || echo "Vite not yet installed"
-
-# Build des assets avec Vite
-RUN npx vite build
-
-# Copier le reste des fichiers de l'application
-COPY . .
+# Build des assets
+RUN npm run build
 
 # Créer les répertoires nécessaires
 RUN mkdir -p database storage/logs storage/framework/{cache,sessions,views} bootstrap/cache
@@ -115,13 +53,6 @@ COPY .env.huggingface .env
 
 # Générer la clé d'application
 RUN php artisan key:generate --force
-
-# Configurer le fichier de démarrage
-COPY start.sh /usr/local/bin/start.sh
-RUN chmod +x /usr/local/bin/start.sh
-
-# Commande par défaut
-CMD ["/usr/local/bin/start.sh"]
 
 # Exécuter les migrations et seeders
 RUN php artisan migrate --force && \
