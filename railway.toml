@@ -1,7 +1,7 @@
 [build]
   builder = "docker"
   buildCommand = "docker build -t military-fleet-management ."
-  startCommand = "docker run -p ${PORT}:80 -e APP_ENV=production -e APP_DEBUG=false -e APP_URL=https://${RAILWAY_PUBLIC_DOMAIN} -e APP_KEY=${APP_KEY} -e DB_CONNECTION=mysql -e DB_HOST=${DB_HOST} -e DB_PORT=${DB_PORT} -e DB_DATABASE=${DB_DATABASE} -e DB_USERNAME=${DB_USERNAME} -e DB_PASSWORD=${DB_PASSWORD} military-fleet-management"
+  startCommand = "docker run -p ${PORT}:80 -e APP_ENV=production -e APP_DEBUG=false -e APP_KEY=${APP_KEY} military-fleet-management"
 
 [deploy]
   startTimeout = 600

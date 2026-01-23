@@ -1,22 +1,4 @@
-# Build stage for Node.js dependencies
-FROM node:20 AS node
-
-WORKDIR /app
-
-# Copy package files needed for npm install
-COPY package*.json ./
-COPY webpack.mix.js ./
-
-# Install dependencies
-RUN npm ci
-
-# Copy the rest of the application
-COPY . .
-
-# Build assets
-RUN npm run production
-
-# Production stage
+# Use the official PHP 8.2 Apache image
 FROM php:8.2-apache
 
 # Install system dependencies
@@ -29,6 +11,8 @@ RUN apt-get update && apt-get install -y \
     libzip-dev \
     zip \
     unzip \
+    nodejs \
+    npm \
     && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip
 
 # Install Composer
@@ -38,7 +22,7 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 WORKDIR /var/www/html
 
 # Copy application files
-COPY --from=node /app /var/www/html
+COPY . .
 
 # Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader --no-interaction \
@@ -46,28 +30,21 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction \
     && php artisan route:cache \
     && php artisan view:cache
 
+# Install Node.js dependencies and build assets
+RUN npm ci && npm run production
+
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Configure Apache
-COPY docker/000-default.conf /etc/apache2/sites-available/000-default.conf
 RUN a2enmod rewrite
+COPY docker/000-default.conf /etc/apache2/sites-available/000-default.conf
 
 # Expose port 80
 EXPOSE 80
 
 # Start Apache
 CMD ["apache2-foreground"]
-COPY package*.json ./
-COPY webpack.mix.js ./
-
-# Install dependencies and build assets
-RUN npm ci && npm run production
-
-# Final stage
-FROM php:8.2-fpm
-
-# Installation des dépendances système
 RUN apt-get update && apt-get install -y \
     git \
     curl \
