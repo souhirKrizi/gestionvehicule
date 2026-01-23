@@ -1,0 +1,50 @@
+# Étape de construction
+FROM node:18 as node
+WORKDIR /app
+
+# Copier les fichiers package et installer les dépendances
+COPY package*.json ./
+RUN npm ci
+
+# Copier le reste des fichiers et construire les assets
+COPY . .
+RUN npm run build
+
+# Étape de production
+FROM php:8.2-fpm
+
+# Installer les dépendances système
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    libzip-dev \
+    zip \
+    unzip \
+    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd zip
+
+# Installer Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+
+# Copier les fichiers de l'application
+WORKDIR /var/www/html
+COPY --from=node /app /var/www/html
+
+# Installer les dépendances PHP
+RUN composer install --no-dev --optimize-autoloader --no-interaction \
+    && php artisan config:cache \
+    && php artisan route:cache \
+    && php artisan view:cache
+
+# Définir les permissions
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Commande de démarrage
+COPY start.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/start.sh
+
+EXPOSE 8000
+
+CMD ["/usr/local/bin/start.sh"]

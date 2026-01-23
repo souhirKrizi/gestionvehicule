@@ -2,33 +2,73 @@ services:
   - type: web
     name: military-fleet-app
     env: php
+    region: frankfurt
     buildCommand: |
       composer install --no-dev --optimize-autoloader
       php artisan config:cache
-      php artisan route:cache  
+      php artisan route:cache
       php artisan view:cache
       npm ci
       npm run build
-    startCommand: bash start.sh
+    startCommand: >
+      php artisan migrate --force && 
+      php artisan serve --host=0.0.0.0 --port=$PORT
     envVars:
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
         value: false
       - key: APP_KEY
-        generateValue: true
-      - key: DB_CONNECTION
-        value: sqlite
-      - key: DB_DATABASE
-        value: /opt/render/project/src/database/database.sqlite
+        value: base64:bxa3NpVtmG911RhnagP1kxrw5m56G8M+Yw45aFjvp/w=
+      - key: APP_URL
+        fromService:
+          name: military-fleet-app
+          property: url
+      - key: LOG_CHANNEL
+        value: stderr
       - key: SESSION_DRIVER
-        value: file
+        value: database
       - key: CACHE_DRIVER
-        value: file
+        value: redis
       - key: QUEUE_CONNECTION
-        value: sync
+        value: redis
+      - key: DB_CONNECTION
+        fromDatabase:
+          name: military-fleet-db
+          property: connectionString
+          propertyType: PGDATABASE
+      - key: DB_DATABASE
+        fromDatabase:
+          name: military-fleet-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: military-fleet-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: military-fleet-db
+          property: password
+      - key: DB_HOST
+        fromDatabase:
+          name: military-fleet-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: military-fleet-db
+          property: port
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: military-fleet-cache
+          property: connectionString
 
 databases:
   - name: military-fleet-db
     databaseName: military_fleet
     user: military_user
+    plan: free
+
+redis:
+  - name: military-fleet-cache
+    plan: free
