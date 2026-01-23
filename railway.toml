@@ -1,0 +1,5 @@
+[build]
+  builder = "nixpacks"
+  buildCommand = "composer install --no-dev --optimize-autoloader && npm ci && npm run build"
+  installCommand = "php artisan key:generate --no-interaction --force && php artisan storage:link"
+  startCommand = "php artisan serve --host=0.0.0.0 --port=${PORT}"

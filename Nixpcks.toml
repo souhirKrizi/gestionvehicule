@@ -1,0 +1,33 @@
+[phases.setup]
+nixPkgs = ['php82', 'php82Extensions.bcmath', 'php82Extensions.gd', 'php82Extensions.mbstring', 'php82Extensions.pdo', 'php82Extensions.pdo_mysql', 'nginx', 'nodejs-18_x']
+
+[phases.install]
+cmds = [
+    'composer install --no-dev --optimize-autoloader',
+    'npm ci',
+    'npm run build'
+]
+
+[phases.build]
+cmds = [
+    'php artisan config:cache',
+    'php artisan route:cache',
+    'php artisan view:cache',
+    'php artisan storage:link'
+]
+
+[start]
+cmd = 'php artisan serve --host=0.0.0.0 --port=$PORT'
+
+[build.args]
+NODE_VERSION = "18"
+
+[build.environment]
+NODE_ENV = "production"
+
+[build.buildpacks]
+php = { }
+nodejs = { }
+
+[build.procs]
+web = "php artisan serve --host=0.0.0.0 --port=$PORT"

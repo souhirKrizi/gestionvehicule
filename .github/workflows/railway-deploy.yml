@@ -1,0 +1,38 @@
+name: Deploy to Railway
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  deploy:
+    name: Deploy to Railway
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+          
+      - name: Install Dependencies
+        run: |
+          npm ci
+          composer install --no-dev --optimize-autoloader
+          
+      - name: Build Assets
+        run: |
+          npm run build
+          
+      - name: Setup Railway CLI
+        uses: railwayapp/cli-action@v1.0.0
+        with:
+          railway-token: ${{ secrets.RAILWAY_TOKEN }}
+          
+      - name: Deploy to Railway
+        run: |
+          railway up --detach
