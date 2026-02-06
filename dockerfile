@@ -30,14 +30,21 @@ COPY composer.json composer.lock package.json package-lock.json ./
 # Installation des dépendances PHP
 RUN composer install --no-dev --optimize-autoloader --no-interaction
 
-# Installation des dépendances Node.js
-RUN npm ci --silent
+# Install Node.js dependencies and build assets
+RUN npm ci && npm run build
+
+# Ensure the public/build directory exists and has the manifest
+RUN mkdir -p public/build && \
+    if [ -f "public/build/manifest.json" ]; then \
+        echo "Manifest found"; \
+    else \
+        echo "Creating manifest..."; \
+        npm run build; \
+    fi
 
 # Copier le reste des fichiers
 COPY . .
 
-# Build des assets
-RUN npm run build
 
 # Créer les répertoires nécessaires
 RUN mkdir -p database storage/logs storage/framework/{cache,sessions,views} bootstrap/cache

@@ -39,6 +39,15 @@ COPY . .
 # Build des assets
 RUN npm run build
 
+# Ensure the public/build directory exists and has the manifest
+RUN mkdir -p public/build && \
+    if [ -f "public/build/manifest.json" ]; then \
+        echo "Manifest found"; \
+    else \
+        echo "Creating manifest..."; \
+        npm run build; \
+    fi
+
 # Créer les répertoires nécessaires
 RUN mkdir -p database storage/logs storage/framework/{cache,sessions,views} bootstrap/cache
 

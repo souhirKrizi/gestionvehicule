@@ -3,6 +3,13 @@ set -e
 
 echo "🚀 Démarrage de l'application sur Render.com..."
 
+# Vérifier que le manifest Vite existe
+if [ ! -f /app/public/build/manifest.json ]; then
+    echo "📦 Vite manifest non trouvé, reconstruction des assets..."
+    npm ci --silent
+    npm run build
+fi
+
 # Vérifier que la base de données existe et est initialisée
 if [ ! -f /app/database/database.sqlite ] || [ ! -s /app/database/database.sqlite ]; then
     echo "📁 Initialisation de la base de données..."

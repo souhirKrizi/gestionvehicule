@@ -3,9 +3,28 @@ services:
     name: carsmanagement
     env: node
     plan: free
-    region: frankfurt
-    buildCommand: bash render-build.sh
-    startCommand: bash render-start.sh
+    buildCommand: |
+      # Install Composer
+      curl -sS https://getcomposer.org/installer | php
+      mv composer.phar /usr/local/bin/composer
+      
+      # Install dependencies
+      composer install --no-dev --optimize-autoloader --no-interaction
+      npm install
+      npm run build
+      
+      # Setup Laravel
+      cp .env.render .env
+      mkdir -p database storage/logs storage/framework/{cache,sessions,views} bootstrap/cache
+      touch database/database.sqlite
+      chmod -R 775 storage bootstrap/cache database
+      php artisan key:generate --force
+      php artisan migrate --force
+      php artisan db:seed --force
+      php artisan config:cache
+      php artisan route:cache
+      php artisan view:cache
+    startCommand: php artisan serve --host=0.0.0.0 --port=$PORT
     envVars:
       - key: APP_NAME
         value: "Gestion de Véhicules Militaires"
@@ -17,29 +36,15 @@ services:
         value: base64:XuvyCgMJdH6yEMmGtIyilBSF3mdjq2RE4kgrw9j1BL0=
       - key: APP_URL
         value: https://carsmanagement.onrender.com
-      - key: APP_LOCALE
-        value: fr
-      - key: APP_FALLBACK_LOCALE
-        value: en
       - key: DB_CONNECTION
         value: sqlite
       - key: DB_DATABASE
         value: /opt/render/project/src/database/database.sqlite
       - key: LOG_CHANNEL
         value: stderr
-      - key: LOG_LEVEL
-        value: error
       - key: SESSION_DRIVER
         value: file
-      - key: SESSION_LIFETIME
-        value: 120
       - key: CACHE_STORE
         value: file
       - key: QUEUE_CONNECTION
         value: sync
-      - key: MAIL_MAILER
-        value: log
-      - key: MAIL_FROM_ADDRESS
-        value: admin@gestion-vehicule.mil
-      - key: MAIL_FROM_NAME
-        value: "Gestion de Véhicules Militaires"
